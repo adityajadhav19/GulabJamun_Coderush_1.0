@@ -130,6 +130,21 @@
             transform: none;
         }
 
+        .download-btn {
+              background-color: #4CAF50; 
+              color: white;             
+              padding: 12px 24px;        
+              font-size: 16px;
+              border: none;
+              border-radius: 8px;       
+              cursor: pointer;
+              transition: 0.3s;
+            }
+
+            .download-btn:hover {
+              background-color: #45a049; 
+              transform: scale(1.05);    
+            }
         /* Main Layout */
         .dashboard {
             display: grid;
@@ -585,6 +600,7 @@
                 <div class="chart-container">
                     <div class="chart-header">
                         <div class="chart-title">L2 Order Book</div>
+                        <button id="download-btn" class="download-btn">Download Order Book</button>
                     </div>
                     <div class="order-book-container" id="orderBookContainer">
                         <!-- Order book data will be populated here -->
@@ -1003,6 +1019,38 @@
                 }
             }, 5000);
         }
+        async function downloadOrderBook() {
+            try {
+        const response = await fetch('/api/hft/order-book');
+        const data = await response.json();
+
+        // Prepare CSV rows
+        const rows = [['Type', 'Price', 'Quantity']];
+        data.bids.forEach(bid => rows.push(['Bid', bid[0], bid[1]]));
+        data.asks.forEach(ask => rows.push(['Ask', ask[0], ask[1]]));
+
+        // Convert to CSV string
+        const csvContent = rows.map(r => r.join(',')).join('\n');
+
+        // Create blob and download link
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'order_book.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Release object URL
+        URL.revokeObjectURL(url);
+
+      } catch (err) {
+        console.error('Error downloading CSV:', err);
+      }
+    }
+
+    document.getElementById('download-btn').addEventListener('click', downloadOrderBook);
     </script>
 </body>
 </html>
