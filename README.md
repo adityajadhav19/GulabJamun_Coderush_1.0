@@ -1,3 +1,5 @@
+## Previous version of Gulab Jamun Sweet Training bot (Hackathon Solution)
+
 # HftBacktest
 
 High-Frequency Trading Backtesting Framework
